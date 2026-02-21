@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kingsley Web Solutions</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background-color: #0b0b0b;
+  color: white;
+  text-align: center;
+}
+.header {
+  background-color: black;
+  padding: 20px;
+  color: gold;
+  font-size: 28px;
+}
+.section {
+  padding: 50px 20px;
+}
+.button {
+  background-color: gold;
+  color: black;
+  padding: 15px 30px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+}
+.footer {
+  background-color: black;
+  padding: 20px;
+  margin-top: 40px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+Kingsley Web Solutions
+</div>
+
+<div class="section">
+<h1>Professional Website Developer</h1>
+<p>I create modern, powerful, and professional websites.</p>
+
+<button class="button" onclick="contact()">Contact Me</button>
+
+<p id="contact"></p>
+</div>
+
+<div class="footer">
+© 2026 Kingsley Web Solutions
+</div>
+
+<script>
+function contact() {
+document.getElementById("contact").innerHTML =
+"WhatsApp: +2348164748126";
+}
+</script>
+
+</body>
+</html>
