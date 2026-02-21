@@ -1,18 +1,128 @@
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>King Chat App</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f0f2f5;
+    }
 
-<script>
+    h2 {
+      background: #1877f2;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    #chat {
+      height: 400px;
+      overflow-y: scroll;
+      background: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .message {
+      background: #e4e6eb;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+    }
+
+    input {
+      width: 70%;
+      padding: 10px;
+    }
+
+    button {
+      padding: 10px;
+      background: #1877f2;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<h2>King Chat App</h2>
+
+<div id="chat"></div>
+
+<input type="text" id="messageInput" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
 const firebaseConfig = {
   apiKey: "AIzaSyAXTg2RHlKjug5nCx6UTJ6v4jiIVElaRlY",
   authDomain: "king-chat-app-a30e4.firebaseapp.com",
   projectId: "king-chat-app-a30e4",
-  storageBucket: "king-chat-app-a30e4.appspot.com",
+  storageBucket: "king-chat-app-a30e4.firebasestorage.app",
   messagingSenderId: "791983811270",
-  appId: "1:791983811270:web:6b3ae6...",
-  measurementId: "G-3KHM6MJPVT"
+  appId: "1:791983811270:web:6a8973ad8e1240a81e45c7"
 };
 
-firebase.initializeApp(firebaseConfig);
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const chatDiv = document.getElementById("chat");
+
+const q = query(collection(db, "messages"), orderBy("time"));
+
+onSnapshot(q, (snapshot) => {
+
+  chatDiv.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+
+    const data = doc.data();
+
+    chatDiv.innerHTML +=
+      "<div class='message'><b>" +
+      data.sender +
+      ":</b> " +
+      data.text +
+      "</div>";
+
+  });
+
+});
+
+
+window.sendMessage = async function () {
+
+  const input = document.getElementById("messageInput");
+
+  const text = input.value;
+
+  if (text == "") return;
+
+  await addDoc(collection(db, "messages"), {
+    text: text,
+    sender: "King",
+    time: Date.now()
+  });
+
+  input.value = "";
+
+};
+
 </script>
+
+</body>
+</html>
