@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My First Website</title>
+  <title>King Chat App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="text-align:center; font-family:Arial;">
+<body style="font-family: Arial; text-align:center; background:#0a0a0a; color:white;">
 
-  <h1>Welcome to My Website</h1>
-  <p>This website is working successfully.</p>
+<h1>👑 King Chat App</h1>
+<p>Your social media app is now connected.</p>
 
-  <button onclick="showMessage()">Click Me</button>
+<button onclick="testFirebase()" style="padding:15px; font-size:18px; background:gold; border:none;">
+Test Connection
+</button>
 
-  <script>
-    function showMessage() {
-      alert("Your website is working!");
-    }
-  </script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAXTg2RHlKjug5nCx6UTJ6v4jiIVElaRlY",
+  authDomain: "king-chat-app-a30e4.firebaseapp.com",
+  projectId: "king-chat-app-a30e4",
+  storageBucket: "king-chat-app-a30e4.firebasestorage.app",
+  messagingSenderId: "791983811270",
+  appId: "1:791983811270:web:6a8973ad8e1240a81e45c7",
+  measurementId: "G-KS9CCMLCQN"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+window.testFirebase = function(){
+  alert("🔥 Firebase connected successfully!");
+}
+
+</script>
 
 </body>
 </html>
