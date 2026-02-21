@@ -1,120 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>King Chat App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>King Chat App</title>
+  <style>
+    body{
+      font-family: Arial;
+      margin:0;
+      background:#f0f2f5;
+    }
 
-<style>
+    header{
+      background:#1877f2;
+      color:white;
+      padding:15px;
+      font-size:20px;
+      text-align:center;
+    }
 
-body{
-margin:0;
-font-family:Arial;
-background:#e4e6eb;
-}
+    #loginPage, #chatPage{
+      padding:15px;
+    }
 
-.header{
-background:#1877f2;
-color:white;
-padding:15px;
-font-size:20px;
-font-weight:bold;
-}
+    input{
+      width:100%;
+      padding:10px;
+      margin:5px 0;
+    }
 
-.container{
-max-width:500px;
-margin:auto;
-background:white;
-height:90vh;
-display:flex;
-flex-direction:column;
-}
+    button{
+      padding:10px;
+      background:#1877f2;
+      color:white;
+      border:none;
+      width:100%;
+      margin-top:5px;
+    }
 
-#messages{
-flex:1;
-overflow:auto;
-padding:10px;
-background:#f0f2f5;
-}
+    #messages{
+      height:300px;
+      background:white;
+      padding:10px;
+      overflow-y:scroll;
+      margin-bottom:10px;
+    }
 
-.message{
-background:white;
-padding:8px;
-margin:5px;
-border-radius:5px;
-box-shadow:0 1px 2px rgba(0,0,0,0.2);
-}
-
-.sender{
-font-weight:bold;
-color:#1877f2;
-}
-
-.input-area{
-display:flex;
-padding:10px;
-background:white;
-}
-
-input{
-flex:1;
-padding:10px;
-border:1px solid #ccc;
-border-radius:5px;
-}
-
-button{
-padding:10px;
-margin-left:5px;
-background:#1877f2;
-color:white;
-border:none;
-border-radius:5px;
-}
-
-.login{
-padding:20px;
-}
-
-</style>
-
+    .msg{
+      padding:5px;
+      border-bottom:1px solid #ddd;
+    }
+  </style>
 </head>
 <body>
 
-<div class="header">
-King Chat App
+<header>King Chat App</header>
+
+<div id="loginPage">
+  <h3>Login / Signup</h3>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="signup()">Signup</button>
+  <button onclick="login()">Login</button>
 </div>
 
-<div class="container">
+<div id="chatPage" style="display:none;">
+  <div id="messages"></div>
 
-<div id="loginDiv" class="login">
+  <input type="text" id="message" placeholder="Type message">
+  <button onclick="sendMessage()">Send</button>
 
-<h3>Login or Register</h3>
-
-<input id="email" placeholder="Email"><br><br>
-
-<input id="password" type="password" placeholder="Password"><br><br>
-
-<button onclick="register()">Register</button>
-
-<button onclick="login()">Login</button>
-
-</div>
-
-<div id="chatDiv" style="display:none; flex-direction:column; height:100%;">
-
-<div id="messages"></div>
-
-<div class="input-area">
-
-<input id="messageInput" placeholder="Type message">
-
-<button onclick="sendMessage()">Send</button>
-
-</div>
-
-</div>
-
+  <button onclick="logout()">Logout</button>
 </div>
 
 <script type="module">
@@ -122,135 +80,131 @@ King Chat App
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-getFirestore,
-collection,
-addDoc,
-query,
-orderBy,
-onSnapshot
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
-getAuth,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword,
-onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 const firebaseConfig = {
-
-apiKey: "YOUR API KEY",
-
-authDomain: "YOUR AUTH DOMAIN",
-
-projectId: "YOUR PROJECT ID",
-
-storageBucket: "YOUR STORAGE",
-
-messagingSenderId: "YOUR SENDER ID",
-
-appId: "YOUR APP ID"
-
+  apiKey: "AIzaSyAXTg2RHlKjug5nCx6UTJ6v4jiIVElaRlY",
+  authDomain: "king-chat-app-a30e4.firebaseapp.com",
+  projectId: "king-chat-app-a30e4",
+  storageBucket: "king-chat-app-a30e4.firebasestorage.app",
+  messagingSenderId: "791983811270",
+  appId: "1:791983811270:web:6a8973ad8e1240a81e45c7",
+  measurementId: "G-KS9CCMLCQN"
 };
-
 
 const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const auth = getAuth();
 
-const auth = getAuth(app);
+const db = getFirestore();
 
 
-window.register = function(){
+window.signup = function(){
 
-const email=document.getElementById("email").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-const password=document.getElementById("password").value;
-
-createUserWithEmailAndPassword(auth,email,password);
-
-};
+  createUserWithEmailAndPassword(auth,email,password)
+  .then(()=>{
+    alert("Signup successful");
+  })
+  .catch(e=>alert(e.message));
+}
 
 
 window.login = function(){
 
-const email=document.getElementById("email").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-const password=document.getElementById("password").value;
-
-signInWithEmailAndPassword(auth,email,password);
-
-};
-
-
-onAuthStateChanged(auth,(user)=>{
-
-if(user){
-
-document.getElementById("loginDiv").style.display="none";
-
-document.getElementById("chatDiv").style.display="flex";
-
-loadMessages();
-
+  signInWithEmailAndPassword(auth,email,password)
+  .then(()=>{
+    alert("Login successful");
+  })
+  .catch(e=>alert(e.message));
 }
 
-});
+
+window.logout = function(){
+  signOut(auth);
+}
 
 
 window.sendMessage = async function(){
 
-const input=document.getElementById("messageInput");
+  const text = document.getElementById("message").value;
 
-if(input.value==="")return;
+  if(text=="") return;
 
-await addDoc(collection(db,"messages"),{
+  await addDoc(collection(db,"messages"),{
+    sender: auth.currentUser.email,
+    text: text,
+    time: Date.now()
+  });
 
-text:input.value,
+  document.getElementById("message").value="";
+}
 
-sender:auth.currentUser.email,
 
-time:Date.now()
+
+onAuthStateChanged(auth,user=>{
+
+  if(user){
+
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("chatPage").style.display="block";
+
+    loadMessages();
+
+  }else{
+
+    document.getElementById("loginPage").style.display="block";
+    document.getElementById("chatPage").style.display="none";
+
+  }
 
 });
-
-input.value="";
-
-};
 
 
 function loadMessages(){
 
-const q=query(collection(db,"messages"),orderBy("time"));
+  const q = query(collection(db,"messages"), orderBy("time"));
 
-onSnapshot(q,(snapshot)=>{
+  onSnapshot(q,snapshot=>{
 
-const messages=document.getElementById("messages");
+    const messagesDiv = document.getElementById("messages");
 
-messages.innerHTML="";
+    messagesDiv.innerHTML="";
 
-snapshot.forEach(doc=>{
+    snapshot.forEach(doc=>{
 
-const msg=doc.data();
+      const msg = doc.data();
 
-messages.innerHTML+=`
+      messagesDiv.innerHTML +=
+      "<div class='msg'><b>"
+      + msg.sender +
+      ":</b> " +
+      msg.text +
+      "</div>";
 
-<div class="message">
+    });
 
-<div class="sender">${msg.sender}</div>
-
-<div>${msg.text}</div>
-
-</div>
-
-`;
-
-});
-
-});
+  });
 
 }
 
