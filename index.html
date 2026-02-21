@@ -1,142 +1,260 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>King Chat App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f0f2f5;
-      margin: 0;
-    }
+<title>King Chat App</title>
 
-    h2 {
-      background: #1877f2;
-      color: white;
-      padding: 15px;
-      margin: 0;
-    }
+<style>
 
-    #messages {
-      padding: 10px;
-      height: 400px;
-      overflow-y: scroll;
-      background: white;
-    }
+body{
+margin:0;
+font-family:Arial;
+background:#e4e6eb;
+}
 
-    #inputArea {
-      display: flex;
-      padding: 10px;
-      background: #eee;
-    }
+.header{
+background:#1877f2;
+color:white;
+padding:15px;
+font-size:20px;
+font-weight:bold;
+}
 
-    #messageInput {
-      flex: 1;
-      padding: 10px;
-      font-size: 16px;
-    }
+.container{
+max-width:500px;
+margin:auto;
+background:white;
+height:90vh;
+display:flex;
+flex-direction:column;
+}
 
-    button {
-      padding: 10px 20px;
-      background: #1877f2;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+#messages{
+flex:1;
+overflow:auto;
+padding:10px;
+background:#f0f2f5;
+}
+
+.message{
+background:white;
+padding:8px;
+margin:5px;
+border-radius:5px;
+box-shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+
+.sender{
+font-weight:bold;
+color:#1877f2;
+}
+
+.input-area{
+display:flex;
+padding:10px;
+background:white;
+}
+
+input{
+flex:1;
+padding:10px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+padding:10px;
+margin-left:5px;
+background:#1877f2;
+color:white;
+border:none;
+border-radius:5px;
+}
+
+.login{
+padding:20px;
+}
+
+</style>
 
 </head>
 <body>
 
-<h2>King Chat App</h2>
+<div class="header">
+King Chat App
+</div>
+
+<div class="container">
+
+<div id="loginDiv" class="login">
+
+<h3>Login or Register</h3>
+
+<input id="email" placeholder="Email"><br><br>
+
+<input id="password" type="password" placeholder="Password"><br><br>
+
+<button onclick="register()">Register</button>
+
+<button onclick="login()">Login</button>
+
+</div>
+
+<div id="chatDiv" style="display:none; flex-direction:column; height:100%;">
 
 <div id="messages"></div>
 
-<div id="inputArea">
-  <input type="text" id="messageInput" placeholder="Type message">
-  <button onclick="sendMessage()">Send</button>
+<div class="input-area">
+
+<input id="messageInput" placeholder="Type message">
+
+<button onclick="sendMessage()">Send</button>
+
 </div>
 
+</div>
+
+</div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot
+getFirestore,
+collection,
+addDoc,
+query,
+orderBy,
+onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import {
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// YOUR FIREBASE CONFIG
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAXTg2RHlKjug5nCx6UTJ6v4jiIVElaRlY",
-  authDomain: "king-chat-app-a30e4.firebaseapp.com",
-  projectId: "king-chat-app-a30e4",
-  storageBucket: "king-chat-app-a30e4.firebasestorage.app",
-  messagingSenderId: "791983811270",
-  appId: "1:791983811270:web:6a8973ad8e1240a81e45c7"
+
+apiKey: "YOUR API KEY",
+
+authDomain: "YOUR AUTH DOMAIN",
+
+projectId: "YOUR PROJECT ID",
+
+storageBucket: "YOUR STORAGE",
+
+messagingSenderId: "YOUR SENDER ID",
+
+appId: "YOUR APP ID"
+
 };
 
 
-// START FIREBASE
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-
-// GET USERNAME
-let username = localStorage.getItem("username");
-
-if (!username) {
-  username = prompt("Enter your name:");
-  localStorage.setItem("username", username);
-}
+const auth = getAuth(app);
 
 
-// SEND MESSAGE
-window.sendMessage = async function () {
+window.register = function(){
 
-  const input = document.getElementById("messageInput");
+const email=document.getElementById("email").value;
 
-  if (input.value === "") return;
+const password=document.getElementById("password").value;
 
-  await addDoc(collection(db, "messages"), {
-    sender: username,
-    text: input.value,
-    time: Date.now()
-  });
+createUserWithEmailAndPassword(auth,email,password);
 
-  input.value = "";
 };
 
 
-// LOAD MESSAGES LIVE
-const q = query(collection(db, "messages"), orderBy("time"));
+window.login = function(){
 
-onSnapshot(q, (snapshot) => {
+const email=document.getElementById("email").value;
 
-  const messagesDiv = document.getElementById("messages");
+const password=document.getElementById("password").value;
 
-  messagesDiv.innerHTML = "";
+signInWithEmailAndPassword(auth,email,password);
 
-  snapshot.forEach((doc) => {
+};
 
-    const msg = doc.data();
 
-    messagesDiv.innerHTML +=
-      "<p><b>" + msg.sender + ":</b> " + msg.text + "</p>";
+onAuthStateChanged(auth,(user)=>{
 
-  });
+if(user){
+
+document.getElementById("loginDiv").style.display="none";
+
+document.getElementById("chatDiv").style.display="flex";
+
+loadMessages();
+
+}
 
 });
 
-</script>
 
+window.sendMessage = async function(){
+
+const input=document.getElementById("messageInput");
+
+if(input.value==="")return;
+
+await addDoc(collection(db,"messages"),{
+
+text:input.value,
+
+sender:auth.currentUser.email,
+
+time:Date.now()
+
+});
+
+input.value="";
+
+};
+
+
+function loadMessages(){
+
+const q=query(collection(db,"messages"),orderBy("time"));
+
+onSnapshot(q,(snapshot)=>{
+
+const messages=document.getElementById("messages");
+
+messages.innerHTML="";
+
+snapshot.forEach(doc=>{
+
+const msg=doc.data();
+
+messages.innerHTML+=`
+
+<div class="message">
+
+<div class="sender">${msg.sender}</div>
+
+<div>${msg.text}</div>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+</script>
 
 </body>
 </html>
