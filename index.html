@@ -96,6 +96,9 @@ import {
   onSnapshot,
   query,
   orderBy
+  doc,
+  setdoc,
+  getdoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
@@ -129,7 +132,7 @@ window.signup = function(){
 }
 
 
-window.login = function(){
+window.login = function(){let currentUsername = "";
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -142,8 +145,28 @@ window.login = function(){
 }
 
 
-window.logout = function(){
-  signOut(auth);
+window.signup = async function(){
+
+  const username = document.getElementById("signupUsername").value;
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
+
+    const user = userCredential.user;
+
+    await setDoc(doc(db,"users",user.uid),{
+      username: username,
+      email: email
+    });
+
+    alert("Signup successful");
+
+  } catch(error){
+    alert(error.message);
+  }
+
 }
 
 
@@ -154,7 +177,7 @@ window.sendMessage = async function(){
   if(text=="") return;
 
   await addDoc(collection(db,"messages"),{
-    sender: auth.currentUser.email,
+    sender: currentUsername
     text: text,
     time: Date.now()
   });
@@ -164,7 +187,25 @@ window.sendMessage = async function(){
 
 
 
-onAuthStateChanged(auth,user=>{
+onAuthStateChanged(auth,user=>{const docSnap = await getDoc(doc(db,"users",user.uid));
+
+    if(docSnap.exists()){
+      currentUsername = docSnap.data().username;
+    }
+
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("chatPage").style.display="block";
+
+    loadMessages();
+
+  }else{
+
+    document.getElementById("loginPage").style.display="block";
+    document.getElementById("chatPage").style.display="none";
+
+  }
+
+});
 
   if(user){
 
